@@ -1,0 +1,7 @@
+*.pyc
+.*.swp
+docs/.build
+docs/_build
+build/
+dist/
+stretchpants.egg-info/

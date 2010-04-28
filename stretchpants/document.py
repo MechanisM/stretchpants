@@ -12,10 +12,6 @@ class SearchDocument(BaseSearchDocument):
     def _document_type(self):
         return self._meta.get("document_type")._class_name.split(".")[-1]
 
-    def get_queryset(self):
-        raise NotImplementedError("Please override this method to return your "
-                                  "document's queryset.")
-
     def count(self):
         if not hasattr(self, "_doc_count"):
             setattr(self, "_doc_count", self.get_queryset().count())
@@ -26,7 +22,7 @@ class SearchDocument(BaseSearchDocument):
         """
         data = {}
         for field in self._fields:
-            if self._fields[field].document_field:
+            if not self._fields[field].provided:
                 # handle document field
                 value = getattr(document, field, None)
                 if value is not None:
@@ -46,7 +42,7 @@ class SearchDocument(BaseSearchDocument):
         qs_fields = [field 
                      for field 
                      in self._fields.keys() 
-                     if self._fields[field].document_field]
+                     if not self._fields[field].provided]
         necessary_fields = self._meta.get("extra_fields")
         if necessary_fields:
             qs_fields += necessary_fields

@@ -1,11 +1,10 @@
 class BaseSearchField(object): 
     
-    def __init__(self, stored=True, indexed=True, document_field=True,
-                 provider=None, id_field=False):
+    def __init__(self, stored=True, indexed=True, provided=False,
+                 id_field=False):
         self.stored = stored
         self.indexed = indexed
-        self.document_field = document_field
-        self._provider = provider
+        self.provided = provided
         self._id_field = id_field
 
     def __get__(self, instance, owner):
@@ -79,3 +78,8 @@ class BaseSearchDocument(object):
 
     def __iter__(self):
         return iter(self._fields)
+        
+    def get_queryset(self):
+        """Override to customize QuerySet.
+        """
+        return self._meta.get("document_type").objects()

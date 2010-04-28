@@ -31,9 +31,13 @@ SearchDocument                  base for indexed documents
 
 class BaseSearchField(object): 
     
-    def __init__(self, stored=True, indexed=True):
+    def __init__(self, stored=True, indexed=True, document_field=True,
+                 provider=None, id_field=False):
         self.stored = stored
         self.indexed = indexed
+        self.document_field = document_field
+        self._provider = provider
+        self._id_field = id_field
 
     def __get__(self, instance, owner):
         if instance is None:
@@ -42,6 +46,9 @@ class BaseSearchField(object):
     
     def __set__(self, instance, value):
         instance._data[self.name] = value
+
+    def prepare(self, value):
+        return value
 
 
 class TopLevelSearchIndex(type):
@@ -54,6 +61,7 @@ class TopLevelSearchIndex(type):
         
         doc_fields = {}
         superclasses = {}
+        id_field = None
         
         for base in bases:
             # Include all fields present in superclasses
@@ -64,13 +72,24 @@ class TopLevelSearchIndex(type):
                 superclasses[base._class_name] = base
                 superclasses.update(base._superclasses)
 
+        # Check for meta properties
+        meta = attrs.get('_meta', attrs.get('meta', {}))
+        attrs['_meta'] = meta
+
         # Add the document's fields to the _fields attribute
         for attr_name, attr_value in attrs.items():
             if hasattr(attr_value, "__class__") and \
                issubclass(attr_value.__class__, BaseSearchField):
                 attr_value.name = attr_name
                 doc_fields[attr_name] = attr_value
+                if attr_value._id_field:
+                    id_field = attr_name
+
+        if id_field is None:
+            raise Exception("Please define an id field")
+
         attrs['_fields'] = doc_fields
+        attrs['_id_field'] = id_field
         
         new_class = super_new(cls, name, bases, attrs)
         return new_class

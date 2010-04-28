@@ -1,34 +1,3 @@
-"""
-
-TopLevelSearchIndex             metaclass, inherits from ``type``
-
-BaseSearchDocument              base for indexed documents. inherits from ``object``.
-
-BaseField                       base for a field of an indexed document
-
-    Methods:
-        def validate            validate that the value is "correct"
-        def prepare             convert values into a type usable by ElasticSearch
-
-    Properties:
-        stored                  boolean. determines if ES should "store" the value.
-        indexed                 boolean. determines if ES should "index" the value.
-        name                    string. name to use when storing in the index.
-
-SearchDocument                  base for indexed documents
-
-    Methods:
-        def save
-        def delete
-    
-    Properties
-        collection_name         name of the index, eg "entities"
-        class_name              document's type, eg "Artist"
-        document_id             document's id. can be string version of objectid.
-        *fields                 collection of BaseField subclasses
-
-"""
-
 class BaseSearchField(object): 
     
     def __init__(self, stored=True, indexed=True, document_field=True,

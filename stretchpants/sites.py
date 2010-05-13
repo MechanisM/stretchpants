@@ -27,7 +27,7 @@ class SearchSite(object):
         if document in self._registry:
             raise RegistrationError("Document %s already registered" % \
                                     document().__class__)
-            
+
         self._registry[document] = index_class()
             
     def unregister(self, document):
@@ -43,5 +43,6 @@ class SearchSite(object):
             raise RegistrationError("%s is not registered" % \
                                     document().__class__)
         return self._registry[document]
+
     
 site = SearchSite()

@@ -30,12 +30,12 @@ class ElasticSearchClient(object):
             raise Exception("Request failed. Status: %s" % response['status'])
         return content
     
-    def put(self, url, body):
+    def _put(self, url, body):
         """Perform HTTP PUT.
         """
         return self._make_request("PUT", url, body)
         
-    def delete(self, url):
+    def _delete(self, url):
         """Perform HTTP DELETE.
         """
         return self._make_request("DELETE", url)
@@ -44,12 +44,18 @@ class ElasticSearchClient(object):
         """Index a document.
         """
         url = self._make_url(idx_doc)
-        return self.put(url, idx_doc.document)
+        return self._put(url, idx_doc.document)
+
+    def search(self, index="_search", type=None, search_spec=None):
+        """Perform a search using a pre-composed spec.
+        
+        :param search_spec: A ``dict``. Must comply with ElasticSearch DSL.
+        :returns: A list of hydrated objects.
+        """
+        pass
 
     def delete(self, idx_doc):
         """Index a document.
         """
         url = self._make_url(idx_doc)
-        return self.delete(url)
-
-
+        return self._delete(url)

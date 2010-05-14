@@ -39,6 +39,8 @@ class SearchDocument(BaseSearchDocument):
     def __iter__(self):
         """Iterate over given QuerySet and yield storable version.
         """
+        from math import ceil
+        
         qs_fields = [field 
                      for field 
                      in self._fields.keys() 
@@ -48,13 +50,21 @@ class SearchDocument(BaseSearchDocument):
             qs_fields += necessary_fields
         qs = self.get_queryset().only(*qs_fields)
         
-        for document in qs:
-            data = self.prepare(document)
-            index_data = {'index': self._meta.get("index"),
-                          'document_type': self._document_type,
-                          'document_id': document[self._id_field],
-                          'document': data}
-            yield IndexableDocument(**index_data)
+        # lets do this in chunks of 1000, eh?
+        limit = 1000
+        iterations = int(ceil(qs.count() / float(limit)))
+        
+        for offset in xrange(0, iterations):
+            start = offset * 1000
+            
+            qs_chunk = qs[start:start+limit]
+            for document in qs_chunk:
+                data = self.prepare(document)
+                index_data = {'index': self._meta.get("index"),
+                              'document_type': self._document_type,
+                              'document_id': document[self._id_field],
+                              'document': data}
+                yield IndexableDocument(**index_data)
 
 
 class IndexableDocument(object):

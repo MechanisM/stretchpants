@@ -28,7 +28,11 @@ class SearchSite(object):
             raise RegistrationError("Document %s already registered" % \
                                     document().__class__)
 
-        self._registry[document] = index_class()
+        # index_class._document_type = document
+        idx_cls = index_class()
+        idx_cls._meta['document_type'] = document
+
+        self._registry[document] = idx_cls
             
     def unregister(self, document):
         """Remove a ``Document`` from the registry.

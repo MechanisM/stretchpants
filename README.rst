@@ -27,8 +27,7 @@ Example: ::
         scores = fields.ListField(document_field=False)
 
         _meta = {'extra_fields': ["artists", "album_ratings"],
-                 'index': "mediatypes",
-                 'document_type': AlbumReview}
+                 'index': "mediatypes"}
 
         def get_queryset(self):
             return AlbumReview.objects()
